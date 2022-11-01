@@ -7,7 +7,6 @@ import threading
 import subprocess
 from pathlib import Path
 from send2trash import send2trash
-from rich import print
 from rich.logging import RichHandler
 from tkinter import (
     Tk,
@@ -36,18 +35,9 @@ from tkinter import (
     X,
     Y,
 )
-
-# FOR DEBUG
-from search_duplicates import search
-from scrolled_frame import VerticalScrolledFrame
-
-# from .search_duplicates import search
-# from .scrolled_frame import VerticalScrolledFrame
-
-# FOR PACKAGE
-# from duplicate.search_duplicates import search
-# from duplicate.scrolled_frame import VerticalScrolledFrame
-
+# my modules
+from duplicate.search_duplicates import search
+from duplicate.scrolled_frame import VerticalScrolledFrame
 
 """
 useful:
@@ -86,11 +76,7 @@ structure tree:
 """
 
 class DuplicatesGUI(Frame):
-    """NamecheckGUI
-    urls - list of urls to be checked
-    items_in_row - number of labels in row
-    """
-
+    """class for checking files duplicates"""
     def __init__(self, master):
         super().__init__(master)
         # default setup
@@ -118,7 +104,7 @@ class DuplicatesGUI(Frame):
         self.master.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.master.geometry("{}x{}".format(650, 500))  # width x height
         self.master.resizable(width=True, height=True)
-        self.master.wm_title("duplicates")
+        self.master.wm_title("duplicate")
         
         # gui
         self.pack()
@@ -127,7 +113,8 @@ class DuplicatesGUI(Frame):
     def spawn_thread(self):
         """spawn thread for search"""
         if self.thread_works:
-            logging.info('thread already works, wait for finish')  # DEBUG
+            # DEBUG
+            logging.info('thread already works, wait for finish')
             return None
             
         # remove previous widgets
@@ -176,8 +163,6 @@ class DuplicatesGUI(Frame):
         if not extensions:
             extensions = ('',)  # to match all extensions
         extensions_text = ','.join(extensions)
-        # extensions_tuple = tuple(['.'  + item if item else item for item in extensions])
-        # self.extensions = extensions_tuple
         self.extensions = extensions
         self.info_label.config(text='extensions set to: {}'.format(extensions))
         logging.info('extensions set to: {}'.format(extensions))
@@ -185,23 +170,6 @@ class DuplicatesGUI(Frame):
         # update entry text
         self.extensions_entry.delete(0, END)
         self.extensions_entry.insert(0, extensions_text)
-        '''
-        # read data from entry
-        new_directory = self.path_entry.get().strip()
-        logging.info(new_directory)
-        
-        # check if path is directory
-        if Path(new_directory).is_dir():
-            self.directory = new_directory
-            # if ok set text to entry
-            self.path_entry.delete(0, END)
-            self.path_entry.insert(0, new_directory)
-        else:
-            # if not set previous text to entry
-            self.path_entry.delete(0, END)
-            self.path_entry.insert(0, self.directory)
-        '''
-        logging.info('extensions entry callback')
         return None
         
     def checkbox_command(self, path, status):
@@ -375,7 +343,7 @@ class DuplicatesGUI(Frame):
         self.main_frame.pack(expand=YES, fill=BOTH, side=TOP)
         
         # info label
-        self.info_label = Label(self.master, text='', borderwidth=2, relief=self.relief)
+        self.info_label = Label(self.master, text='', borderwidth=3, relief=self.relief)
         self.info_label.pack(expand=NO, fill=BOTH, side=BOTTOM)
         
         # *********** lift, get focus ***********
@@ -391,7 +359,6 @@ class DuplicatesGUI(Frame):
         https://python-forum.io/thread-10689.html
         """
         logging.info('{}'.format(directory))
-        # opener = "open" if sys.platform == "darwin" else "xdg-open"
         if sys.platform == "darwin":
             opener = "open"
         elif sys.platform == "win32":
@@ -404,51 +371,6 @@ class DuplicatesGUI(Frame):
         subprocess.call([opener, directory], shell=True)
         return None
         
-    def update_labels(self):
-        for (key, url, value) in self.accounts_found:
-            link_label = self.labels_mapping[key]
-            color = self.color_mapping(value)
-            link_label.config(bg=color)
-
-            # unbind previous events
-            link_label.unbind("<Double-Button-1>")
-            link_label.unbind("<ButtonRelease-2>")
-            link_label.unbind("<Button-3>")
-            link_label.unbind("<Enter>")
-            link_label.unbind("<Leave>")
-
-            # bind new events
-            link_label.bind(
-                "<Double-Button-1>", lambda event, url=url: self.click_callback(url)
-            )
-            link_label.bind(
-                "<ButtonRelease-2>", lambda event, url=url: self.click_callback(url)
-            )
-            link_label.bind("<Button-3>", lambda event, url=url: self.popup(event, url))
-            link_label.bind(
-                "<Enter>", lambda event, text=url: self.on_start_hover(text)
-            )
-            link_label.bind("<Leave>", lambda event: self.on_end_hover())
-
-        return None
-        
-    def color_mapping(self, flag):
-        """labels color mapping
-            lightgreen: #90EE90
-            lightgrey:  #8E9899
-            lightred:   #F47B7F
-        https://www.color-name.com/neutral-cyan.color
-        """
-        if flag == True:
-            color = "#90EE90"  # lightgreen
-        elif flag == False:
-            color = "#8E9899"  # lightgrey
-        elif flag == None:
-            color = "#F47B7F"  # lightred
-        else:
-            color = "white"
-        return color
-
     def popup(self, event, path):
         """popup window for handling mouse rightclick
         https://stackoverflow.com/questions/12014210/tkinter-app-adding-a-right-click-context-menu
@@ -462,31 +384,6 @@ class DuplicatesGUI(Frame):
             popup_menu.grab_release()
         return None
         
-    def _old_popup(self, event, url):
-        """popup window for handling mouse rightclick
-        https://stackoverflow.com/questions/12014210/tkinter-app-adding-a-right-click-context-menu
-        https://www.askpython.com/python-modules/tkinter/menu-bar-and-menubutton
-        """
-        popup_menu = Menu(self, tearoff=0)
-        popup_menu.add_command(label="copy", command=lambda: pyperclip.copy(url))
-        try:
-            popup_menu.tk_popup(event.x_root, event.y_root, 0)
-        finally:
-            popup_menu.grab_release()
-        return None
-        
-    def on_start_hover(self, text):
-        """on mouse start hover cell (label)"""
-        self.info_label.config(text=text)
-
-    def on_end_hover(self):
-        """on mouse end hover cell (label)"""
-        self.info_label.config(text="")
-
-    def click_callback(self, url):
-        """open url in browser"""
-        webbrowser.open_new(url)
-
     def on_closing(self):
         """handle application closing"""
         self.master.destroy()
@@ -494,14 +391,13 @@ class DuplicatesGUI(Frame):
         
         
 def gui():
-    """duplicates gui for import"""
+    """duplicates gui for entrypoint"""
     gui = DuplicatesGUI(master=Tk())
     gui.mainloop()
     return None
     
     
 if __name__ == "__main__":
-    print('executed from main')
     FORMAT = "%(message)s"
     LEVEL = logging.INFO
     logging.basicConfig(format=FORMAT, level=LEVEL, handlers=[RichHandler()])
