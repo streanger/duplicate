@@ -16,15 +16,17 @@ duplicate
 
 # as module
 python -m duplicate
+```
 
+```python
 # from python
 import duplicate
-duplicate.gui
+duplicate.gui()
 ```
 
 ## screenshots
 
-todo
+![image](screenshots/duplicate01.png)
 
 ## ideas
 
@@ -50,4 +52,4 @@ todo
 
 - pylint & black todo
 
-- screenshots to upload
+- screenshot(s) to upload (+)
