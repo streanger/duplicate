@@ -36,11 +36,10 @@ structure tree:
     │   └── setup.py
 
 """
+
 import sys
 import os
 import re
-
-# import hashlib
 import logging
 import threading
 import subprocess
@@ -50,10 +49,8 @@ from tkinter import (
     Menu,
     Entry,
     Frame,
-    # Widget,
     Label,
     IntVar,
-    # Text,
     LabelFrame,
     Checkbutton,
     filedialog,
@@ -65,12 +62,8 @@ from tkinter import (
     END,
     BOTTOM,
     LEFT,
-    # RIGHT,
     BOTH,
-    # HORIZONTAL,
     W,
-    # X,
-    # Y,
 )
 
 from send2trash import send2trash
@@ -389,8 +382,6 @@ class DuplicatesGUI(Frame):
         self.master.lift()  # move window to the top
         self.master.focus_force()
         return None
-
-
 
     def popup(self, event, path):
         """popup window for handling mouse rightclick
