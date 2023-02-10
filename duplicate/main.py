@@ -25,7 +25,8 @@ useful:
     https://github.com/arsenetar/dupeguru
     https://python-forum.io/thread-10689.html
     https://stackoverflow.com/questions/4998629/split-string-with-multiple-delimiters-in-python
-
+    https://stackoverflow.com/questions/36688966/let-a-class-behave-like-its-a-list-in-python
+    
 structure tree:
     .
     ├── project
@@ -70,7 +71,7 @@ from send2trash import send2trash
 from rich.logging import RichHandler
 
 # my modules
-from duplicate.search_duplicates import search
+from duplicate.search_duplicates import search, FileHash
 from duplicate.scrolled_frame import VerticalScrolledFrame
 
 

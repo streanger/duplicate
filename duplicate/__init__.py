@@ -1,2 +1,2 @@
-from duplicate.main import gui, search
-__all__ = ["gui", "search"]
+from duplicate.main import gui, search, FileHash
+__all__ = ["gui", "search", "FileHash"]
