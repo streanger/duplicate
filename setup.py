@@ -1,11 +1,12 @@
 import setuptools
+from duplicate.__version__ import __version__
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
     name='duplicate',
-    version='0.1.1',
+    version=__version__,
     author="streanger",
     description="files duplicate viewer",
     long_description=long_description,

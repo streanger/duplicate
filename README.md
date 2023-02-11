@@ -38,6 +38,10 @@ print(results)
 ![image](screenshots/duplicate01.png)
 
 ## changelog
+- v. 0.1.2
+    - fix for `OSError` using `gc.collect()` due to locked file handles after many search
+    - __slots__ in `FileHash` class
+    - version info in gui and cli
 
 - v. 0.1.1
     - initial filter and matching by files size

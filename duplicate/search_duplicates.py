@@ -1,8 +1,9 @@
 import os
+import gc
 import re
 import hashlib
 from pathlib import Path
-from itertools import groupby
+from itertools import groupby, filterfalse
 
 
 def list_directory_files(directory):
@@ -52,9 +53,12 @@ def create_files_handles(directory='.', extensions=None):
             file_handle = FileHash(filepath)
             files.append(file_handle)
         except OSError:
+            pass
             # file not exists
             # think of passing logger here and log info
-            pass
+            # when we rapidly use search, this error will occur
+            # it may be cause of keeping previous handle to file
+            # use of gc.collect() at the end of search() fix that
     return files
 
 
@@ -78,8 +82,8 @@ def objects_dupli(files):
 
         # calc next block & split files depend on end of file status
         handles = [handle.next_block() for handle in handles]
-        handles_next = [handle for handle in handles if not handle.end]
-        handles_end = [handle for handle in handles if handle.end]
+        handles_next = filterfalse(lambda handle: not handle.end, handles)
+        handles_end = filterfalse(lambda handle: handle.end, handles)
         dupli_next = objects_dupli(handles_next)
         dupli_end = objects_dupli(handles_end)
         duplicates.extend(dupli_next)
@@ -104,15 +108,16 @@ def search(directory, extensions=None):
         [handle.set_block_size(block_size) for handle in group]
         part = objects_dupli(group)
         total.extend(part)
+    gc.collect()
     return total
 
 
 class FileHash:
     """calculates sha256 hash of next n bytes of data from file"""
-    block_size = 1024  # 1kB
-    # TODO: use tuple fields instead of dict
+    __slots__ = ('block_size', 'filename', 'size', 'file_handle', 'chunks', 'digest', 'hexdigest', 'end')
 
     def __init__(self, filename):
+        self.block_size = 1024  # 1kB
         self.filename = filename
         self.size = os.stat(filename).st_size
         self.file_handle = open(filename, 'rb')
@@ -152,6 +157,10 @@ class FileHash:
 
     def __str__(self):
         return '<{}>:<{}>'.format(Path(self.filename).name, self.hexdigest)
+
+    # TODO: do we need that?
+    # def __delete__(self):
+    #     self.file_handle.close()
 
 
 if __name__ == "__main__":

@@ -74,6 +74,7 @@ from rich import print
 # my modules
 from duplicate.search_duplicates import search, split_extensions
 from duplicate.scrolled_frame import VerticalScrolledFrame
+from duplicate.__version__ import __version__
 
 
 class DuplicatesGUI(Frame):
@@ -106,7 +107,7 @@ class DuplicatesGUI(Frame):
         self.master.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.master.geometry("{}x{}".format(650, 500))  # width x height
         self.master.resizable(width=True, height=True)
-        self.master.wm_title("duplicate")
+        self.master.wm_title("duplicate {}".format(__version__))
 
         # gui
         self.pack()
@@ -430,7 +431,7 @@ def gui():
 
 def cli():
     """duplicates cli for entrypoint"""
-    description = "files duplicate search tool"
+    description = "files duplicate search tool, version: {}".format(__version__)
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument(
         'directory',
