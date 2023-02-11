@@ -40,7 +40,7 @@ print(results)
 ## changelog
 - v. 0.1.2
     - fix for `OSError` using `gc.collect()` due to locked file handles after many search
-    - __slots__ in `FileHash` class
+    - `__slots__` in `FileHash` class
     - version info in gui and cli
 
 - v. 0.1.1
