@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name='duplicate',
-    version='0.1.0',
+    version='0.1.1',
     author="streanger",
     description="files duplicate viewer",
     long_description=long_description,
@@ -17,7 +17,7 @@ setuptools.setup(
     package_data={},
     entry_points={
         "console_scripts": [
-            "duplicate=duplicate:gui",
+            "duplicate=duplicate:duplicate_entrypoint",
         ]
     },
 )

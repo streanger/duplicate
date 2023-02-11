@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from search_duplicates import FileHash
+from duplicate import FileHash
 
 
 def script_path():

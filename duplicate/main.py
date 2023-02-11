@@ -26,7 +26,8 @@ useful:
     https://python-forum.io/thread-10689.html
     https://stackoverflow.com/questions/4998629/split-string-with-multiple-delimiters-in-python
     https://stackoverflow.com/questions/36688966/let-a-class-behave-like-its-a-list-in-python
-    
+    https://stackoverflow.com/questions/2104080/how-do-i-check-file-size-in-python
+
 structure tree:
     .
     ├── project
@@ -35,12 +36,11 @@ structure tree:
     │   │   ├── module.py
     │   │   └── standalone.py
     │   └── setup.py
-
 """
 
+import argparse
 import sys
 import os
-import re
 import logging
 import threading
 import subprocess
@@ -69,9 +69,10 @@ from tkinter import (
 
 from send2trash import send2trash
 from rich.logging import RichHandler
+from rich import print
 
 # my modules
-from duplicate.search_duplicates import search, FileHash
+from duplicate.search_duplicates import search, split_extensions
 from duplicate.scrolled_frame import VerticalScrolledFrame
 
 
@@ -157,10 +158,7 @@ class DuplicatesGUI(Frame):
 
         # read and parse text
         text = self.extensions_entry.get().strip()
-        extensions = [
-            item.strip(" .") for item in re.split(",|;| ", text) if item.strip()
-        ]
-        extensions = tuple(sorted(set(extensions)))
+        extensions = split_extensions(text)
 
         # update extensions
         if not extensions:
@@ -227,7 +225,7 @@ class DuplicatesGUI(Frame):
             labelframe.pack(expand=YES, fill=BOTH, side=TOP)
 
             items_number = len(values)
-            for index, filepath in enumerate(values):
+            for index, (_, filepath) in enumerate(values):
                 box_status = IntVar()
                 remove_box = Checkbutton(
                     labelframe,
@@ -428,7 +426,48 @@ def gui():
     """duplicates gui for entrypoint"""
     gui_object = DuplicatesGUI(master=Tk())
     gui_object.mainloop()
-    return None
+
+
+def cli():
+    """duplicates cli for entrypoint"""
+    description = "files duplicate search tool"
+    parser = argparse.ArgumentParser(description=description)
+    parser.add_argument(
+        'directory',
+        type=str,
+        help='path to directory to search for duplicates'
+    )
+    parser.add_argument(
+        'extensions',
+        type=str,
+        default="",
+        nargs="?",
+        help='files extensions to search through, e.g.: ".jpg, .png, .gif"'
+    )
+    args = parser.parse_args()
+    directory = args.directory
+    extensions = split_extensions(args.extensions)
+    if not Path(directory).is_dir():
+        print('not a directory: {}'.format(directory))
+        return False
+
+    results = search(directory, extensions)
+    for (key, items) in results:
+        items_str = '\n'.join(['    {}'.format(item.filename) for item in items])
+        print(key)
+        print(items_str)
+        print()
+    return True
+
+
+def duplicate_entrypoint():
+    """package main entrypoint
+    depend on cli arguments will trigger cli or gui
+    """
+    if len(sys.argv) > 1:
+        cli()
+    else:
+        gui()
 
 
 if __name__ == "__main__":
@@ -436,5 +475,5 @@ if __name__ == "__main__":
     LEVEL = logging.INFO
     logging.basicConfig(format=FORMAT, level=LEVEL, handlers=[RichHandler()])
 
-    # *********** main ***********
-    gui()
+    # entrypoint
+    duplicate_entrypoint()

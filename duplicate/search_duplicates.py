@@ -1,10 +1,8 @@
 import os
+import re
 import hashlib
 from pathlib import Path
 from itertools import groupby
-from rich import print
-
-# TODO: look on memory usage, and use gc if needed
 
 
 def list_directory_files(directory):
@@ -12,49 +10,45 @@ def list_directory_files(directory):
     for (dirpath, _, filenames) in os.walk(directory):
         for f in filenames:
             yield os.path.abspath(os.path.join(dirpath, f))
-            
-            
-def group_pairs_old(pairs):
-    """group files by hashes
-    pairs = [('hash1', 'file1.txt'), ('hash2', 'file2.txt'), ('hash1', 'file5.txt'), ('hash2', 'file4.txt'), ('hash2', 'file3.txt'), ('hash3', 'file6.txt')]
-    """
-    matched = [
-        (key, [item[1] for item in items])
-        for key, items in groupby(sorted(pairs, key=lambda ele: ele[0]), key=lambda ele: ele[0])
+
+
+def split_extensions(text):
+    """split text to files extensions"""
+    extensions = [
+        item.strip(" .") for item in re.split(",|;| ", text) if item.strip()
     ]
-    return matched
+    extensions = tuple(sorted(set(extensions)))
+    return extensions
 
 
-def group_files(handles):
-    """group files handles by hashes
-    handles = [('hash1', 'file1.txt'), ('hash2', 'file2.txt'), ('hash1', 'file5.txt'), ('hash2', 'file4.txt'), ('hash2', 'file3.txt'), ('hash3', 'file6.txt')]
-    """
+def group_by_hash(handles):
+    """group files handles by hashes"""
     matched = [
         (key, list(items))
-        for key, items in groupby(sorted(handles, key=lambda ele: ele[0]), key=lambda ele: ele[0])
+        for key, items in groupby(sorted(handles, key=lambda ele: ele.hexdigest), key=lambda ele: ele.hexdigest)
     ]
     return matched
-    
-
-def file_md5(filename):
-    """calculate file md5 hash"""
-    hash_md5 = hashlib.md5()
-    with open(filename, "rb") as f:
-        for chunk in iter(lambda: f.read(4096), b""):
-            hash_md5.update(chunk)
-    return hash_md5.hexdigest()
 
 
-def create_files_handles(directory='.', extensions=('',)):
-    """search duplicates (fixed)"""
-    # calc hashes and make pairs (hash - filename)
+def group_by_size(handles):
+    """group files handles by size"""
+    matched = [
+        list(items)
+        for key, items in groupby(sorted(handles, key=lambda ele: ele.size), key=lambda ele: ele.size)
+    ]
+    return matched
+
+
+def create_files_handles(directory='.', extensions=None):
+    """create file handlers for hash calc"""
+    if extensions is None or extensions == ():
+        extensions = ('',)
     files_paths = list_directory_files(directory)
     files = []
     for filepath in files_paths:
         try:
             if not Path(filepath).suffix.endswith(extensions):
                 continue
-            # pair = (file_md5(filepath), filepath)
             file_handle = FileHash(filepath)
             files.append(file_handle)
         except OSError:
@@ -64,15 +58,15 @@ def create_files_handles(directory='.', extensions=('',)):
     return files
 
 
-def search(files):
-    """files - files handles
+def objects_dupli(files):
+    """find duplicates in list of files handles
     
-    DO I NEED RECURSION EVERYWHERE HERE?
+    it works recursively
     """
     duplicates = []
 
     # match pairs with hashes
-    matched = group_files(files)
+    matched = group_by_hash(files)
 
     # filter duplicates only
     semi_duplicates = [(key, values) for key, values in matched if len(values) > 1]
@@ -82,20 +76,37 @@ def search(files):
         if handles[0].end:
             return [(key, handles)]
 
-        print(handles)
-        input()
-        # calc next block
+        # calc next block & split files depend on end of file status
         handles = [handle.next_block() for handle in handles]
-        # split items into ended with file read or not
         handles_next = [handle for handle in handles if not handle.end]
         handles_end = [handle for handle in handles if handle.end]
-        dupli_next = search(handles_next)
-        dupli_end = search(handles_end)
+        dupli_next = objects_dupli(handles_next)
+        dupli_end = objects_dupli(handles_end)
         duplicates.extend(dupli_next)
         duplicates.extend(dupli_end)
     return duplicates
+
+
+def search(directory, extensions=None):
+    """search for duplicate files
     
-    
+    params:
+        directory - directory to search in
+        extensions - files extensions to search through
+    """
+    files = create_files_handles(directory=directory, extensions=extensions)
+    grouped = group_by_size(files)
+    total = []
+    for group in grouped:
+        if len(group) == 1:
+            continue
+        block_size = max(1024, group[0].size//100)
+        [handle.set_block_size(block_size) for handle in group]
+        part = objects_dupli(group)
+        total.extend(part)
+    return total
+
+
 class FileHash:
     """calculates sha256 hash of next n bytes of data from file"""
     block_size = 1024  # 1kB
@@ -103,6 +114,7 @@ class FileHash:
 
     def __init__(self, filename):
         self.filename = filename
+        self.size = os.stat(filename).st_size
         self.file_handle = open(filename, 'rb')
         self.chunks = self.generate_chunks()
         self.digest = hashlib.sha256()
@@ -111,6 +123,10 @@ class FileHash:
 
     def __getitem__(self, item):
         return (self.hexdigest, self.filename)[item]
+
+    def set_block_size(self, size):
+        """set block size"""
+        self.block_size = size
 
     def generate_chunks(self):
         """generate file data chunks for further processing"""
@@ -135,12 +151,11 @@ class FileHash:
         return '<{}>:<{}>'.format(Path(self.filename).name, self.hexdigest)
 
     def __str__(self):
-        return self.hexdigest
-        
-        
+        return '<{}>:<{}>'.format(Path(self.filename).name, self.hexdigest)
+
+
 if __name__ == "__main__":
-    print('search_duplicates module')
-    directory = r'directory'
-    files = create_files_handles(directory=directory, extensions=('.pdf',))
-    out = search(files)
-    print(out)
+    os.chdir(str(Path(__file__).parent))
+    directory = r'..\example_files_tree\random_blocks'
+    duplicates = search(directory)
+    print(duplicates)

@@ -1,2 +1,2 @@
-from duplicate.main import gui
-gui()
+from duplicate.main import duplicate_entrypoint
+duplicate_entrypoint()

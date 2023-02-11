@@ -12,25 +12,45 @@ pip install git+https://github.com/streanger/duplicate.git
 
 ```bash
 # from cli
-duplicate
+duplicate  # with no args will run gui
+duplicate <directory>  # will run cli search
+duplicate . ".jpg, .png"  # search in current directory, filter by .jpg, .png
 
 # as module
 python -m duplicate
 ```
 
 ```python
-# from python
+# gui
 import duplicate
 duplicate.gui()
+
+# console search
+from rich import print
+from duplicate import search
+directory = 'path/to/directory/with/duplicates
+results = search(directory)
+print(results)
 ```
 
 ## screenshots
 
 ![image](screenshots/duplicate01.png)
 
+## changelog
+
+- v. 0.1.1
+    - initial filter and matching by files size
+    - files handle, which allows for reading files in chunks, what improves speed a lot
+    - entrypoint cli and gui support
+    
+- v. 0.1.0
+    - gui
+    - matching hashes of full file content
+
 ## ideas
 
-- faster search
+- faster search (+)
 
 - faster window moving while many rows exists
 
