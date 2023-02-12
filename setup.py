@@ -1,19 +1,22 @@
 import setuptools
-from duplicate.__version__ import __version__
+from pathlib import Path
 
-with open("README.md", "r") as fh:
-    long_description = fh.read()
+version_path = Path(__file__).parent / "duplicate/__version__.py"
+version_info = {}
+exec(version_path.read_text(), version_info)
+long_description = Path("README.md").read_text()
+requirements = Path('requirements.txt').read_text().splitlines()
 
 setuptools.setup(
     name='duplicate',
-    version=__version__,
+    version=version_info['__version__'],
     author="streanger",
     description="files duplicate viewer",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/streanger/duplicate",
     packages=['duplicate',],
-    install_requires=['rich', 'Send2Trash'],
+    install_requires=requirements,
     include_package_data=True,
     package_data={},
     entry_points={
