@@ -211,6 +211,7 @@ class DuplicatesGUI(Frame):
         https://stackoverflow.com/questions/15995783/how-to-delete-all-children-elements
         """
         # search for duplicates
+        self.info_label.config(text="keep searching...")
         duplicates = search(self.directory, self.extensions)
         logging.info(duplicates)
         if duplicates:

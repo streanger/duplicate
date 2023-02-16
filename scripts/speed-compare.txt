@@ -1,0 +1,68 @@
+
+search speed for the same number of files (project directory):
+generator:
+    elapsed time: 0.33156323432922363s
+    elapsed time: 0.31461334228515625s
+    elapsed time: 0.2948305606842041s
+    elapsed time: 0.29689955711364746s
+    elapsed time: 0.29688549041748047s
+    elapsed time: 0.2969057559967041s
+    elapsed time: 0.3125190734863281s
+    elapsed time: 0.2962322235107422s
+    elapsed time: 0.2969064712524414s
+    elapsed time: 0.29688429832458496s
+    elapsed time: 0.2969043254852295s
+    elapsed time: 0.29689502716064453s
+    elapsed time: 0.29125094413757324s
+    elapsed time: 0.2916903495788574s
+    elapsed time: 0.29689621925354004s
+    elapsed time: 0.2968931198120117s
+    elapsed time: 0.31734633445739746s
+    elapsed time: 0.2989165782928467s
+    elapsed time: 0.31252145767211914s
+    elapsed time: 0.2968864440917969s
+
+open & close (with self.file_handle attribute):
+    elapsed time: 0.42052555084228516s
+    elapsed time: 0.41639018058776855s
+    elapsed time: 0.39624500274658203s
+    elapsed time: 0.39064955711364746s
+    elapsed time: 0.4062767028808594s
+    elapsed time: 0.4062683582305908s
+    elapsed time: 0.3906519412994385s
+    elapsed time: 0.39065980911254883s
+    elapsed time: 0.4056553840637207s
+    elapsed time: 0.39065027236938477s
+    elapsed time: 0.3906514644622803s
+    elapsed time: 0.3906595706939697s
+    elapsed time: 0.3906519412994385s
+    elapsed time: 0.4064803123474121s
+    elapsed time: 0.38454127311706543s
+    elapsed time: 0.3906569480895996s
+    elapsed time: 0.4062774181365967s
+    elapsed time: 0.39065122604370117s
+    elapsed time: 0.39065074920654297s
+    elapsed time: 0.3906593322753906s
+
+open & close (without self.file_handle attribute):
+    elapsed time: 0.25002264976501465s
+    elapsed time: 0.2187671661376953s
+    elapsed time: 0.2290635108947754s
+    elapsed time: 0.21876263618469238s
+    elapsed time: 0.2343921661376953s
+    elapsed time: 0.21876311302185059s
+    elapsed time: 0.2187645435333252s
+    elapsed time: 0.2187647819519043s
+    elapsed time: 0.2187209129333496s
+    elapsed time: 0.218764066696167s
+    elapsed time: 0.2343912124633789s
+    elapsed time: 0.2187638282775879s
+    elapsed time: 0.22748231887817383s
+    elapsed time: 0.2087869644165039s
+    elapsed time: 0.23436856269836426s
+    elapsed time: 0.2187643051147461s
+    elapsed time: 0.2187645435333252s
+    elapsed time: 0.2187647819519043s
+    elapsed time: 0.23438739776611328s
+    elapsed time: 0.21876788139343262s
+

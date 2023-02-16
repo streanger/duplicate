@@ -38,6 +38,10 @@ print(results)
 ![image](screenshots/duplicate01.png)
 
 ## changelog
+- v. 0.1.3
+    - reading chunks of data using "with" statement. Only one file handle at the time is opened
+    - `keep searching...` while search lasts
+
 - v. 0.1.2
     - fix for `OSError` using `gc.collect()` due to locked file handles after many search
     - `__slots__` in `FileHash` class
@@ -53,6 +57,10 @@ print(results)
     - matching hashes of full file content
 
 ## ideas
+
+- feature of breaking threads using `clear` button
+
+- dynamically pack labels - show only visible ones
 
 - faster search (+)
 

@@ -41,7 +41,11 @@ def group_by_size(handles):
 
 
 def create_files_handles(directory='.', extensions=None):
-    """create file handlers for hash calc"""
+    """create file handlers for hash calc
+
+    more about file handlers:
+        https://stackoverflow.com/questions/8582076/class-wrapper-around-file-proper-way-to-close-file-handle-when-no-longer-refe
+    """
     if extensions is None or extensions == ():
         extensions = ('',)
     files_paths = list_directory_files(directory)
@@ -52,8 +56,10 @@ def create_files_handles(directory='.', extensions=None):
                 continue
             file_handle = FileHash(filepath)
             files.append(file_handle)
-        except OSError:
+        except OSError as err:
             pass
+            # print(err)
+            # print(filepath)
             # file not exists
             # think of passing logger here and log info
             # when we rapidly use search, this error will occur
@@ -63,9 +69,8 @@ def create_files_handles(directory='.', extensions=None):
 
 
 def objects_dupli(files):
-    """find duplicates in list of files handles
-    
-    it works recursively
+    """
+    find duplicates in list of files handles. Works recursively
     """
     duplicates = []
 
@@ -108,23 +113,25 @@ def search(directory, extensions=None):
         [handle.set_block_size(block_size) for handle in group]
         part = objects_dupli(group)
         total.extend(part)
+
+    del files
+    del grouped
     gc.collect()
     return total
 
 
 class FileHash:
     """calculates sha256 hash of next n bytes of data from file"""
-    __slots__ = ('block_size', 'filename', 'size', 'file_handle', 'chunks', 'digest', 'hexdigest', 'end')
+    __slots__ = ('block_size', 'filename', 'size', 'digest', 'hexdigest', 'end', 'last_position')
 
     def __init__(self, filename):
         self.block_size = 1024  # 1kB
         self.filename = filename
         self.size = os.stat(filename).st_size
-        self.file_handle = open(filename, 'rb')
-        self.chunks = self.generate_chunks()
         self.digest = hashlib.sha256()
         self.hexdigest = self.digest.hexdigest()
         self.end = False
+        self.last_position = 0
 
     def __getitem__(self, item):
         return (self.hexdigest, self.filename)[item]
@@ -133,19 +140,13 @@ class FileHash:
         """set block size"""
         self.block_size = size
 
-    def generate_chunks(self):
-        """generate file data chunks for further processing"""
-        while True:
-            data = self.file_handle.read(self.block_size)
-            if not data:
-                break
-            yield data
-            
     def next_block(self):
         """update digest with next block"""
-        try:
-            next_bytes = next(self.chunks)
-        except StopIteration:
+        with open(self.filename, 'rb') as f:
+            f.seek(self.last_position)
+            next_bytes = f.read(self.block_size)
+            self.last_position = f.tell()
+        if not next_bytes:
             self.end = True
             return self
         self.digest.update(next_bytes)
@@ -158,13 +159,12 @@ class FileHash:
     def __str__(self):
         return '<{}>:<{}>'.format(Path(self.filename).name, self.hexdigest)
 
-    # TODO: do we need that?
-    # def __delete__(self):
-    #     self.file_handle.close()
-
 
 if __name__ == "__main__":
     os.chdir(str(Path(__file__).parent))
     directory = r'..\example_files_tree\random_blocks'
     duplicates = search(directory)
     print(duplicates)
+
+    # filepath = r'..\example_files_tree\random_blocks\HDMONJEXUJ.bin'
+    # handle = FileHash(filepath)

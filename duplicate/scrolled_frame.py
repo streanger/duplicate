@@ -44,17 +44,8 @@ class VerticalScrolledFrame:
         bg = kwargs.pop("bg", kwargs.pop("background", None))
         self.outer = Frame(master, **kwargs)
 
-        if True:
-            self.vsb = Scrollbar(self.outer, orient=VERTICAL)
-            self.vsb.pack(fill=Y, side=RIGHT, expand=NO)
-        else:
-            style = Style()
-            style.configure("RW.TLabel", foreground="red", background="black")
-            self.vsb = Scrollbar(
-                self.outer, orient=VERTICAL, cursor="arrow", style="RW.TLabel"
-            )
-            self.vsb.pack(fill=Y, side=RIGHT, expand=NO)
-
+        self.vsb = Scrollbar(self.outer, orient=VERTICAL)
+        self.vsb.pack(fill=Y, side=RIGHT, expand=NO)
         self.canvas = Canvas(
             self.outer, highlightthickness=0, width=width, height=height, bg=bg
         )
@@ -104,6 +95,12 @@ class VerticalScrolledFrame:
 
     def _on_mousewheel(self, event):
         """Linux uses event.num; Windows / Mac uses event.delta"""
+        # TODO: for further debug, to show a finite number of labels
+        # in a scroll view
+        # print('scrolled')
+        # .winfo_viewable()
+        # self.outer
+        # self.outer.children['!canvas'].children['!frame'].children['!frame'].children
         if event.num == 4 or event.delta > 0:
             self.canvas.yview_scroll(-1, "units")
         elif event.num == 5 or event.delta < 0:
