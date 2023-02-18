@@ -58,6 +58,10 @@ print(results)
 
 ## ideas
 
+- multithreaded file loading, to increase speed
+
+- different hashing algorithm
+
 - feature of breaking threads using `clear` button
 
 - dynamically pack labels - show only visible ones
