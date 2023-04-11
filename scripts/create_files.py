@@ -21,7 +21,7 @@ def write_bin(filename, data):
 def generate_data():
     """with random number of fixed size blocks"""
     length = random.randrange(1, len(ascii_uppercase))
-    block_size = 1024
+    block_size = 4096
     data = b""
     for x in range(length):
         char = ascii_uppercase[x]

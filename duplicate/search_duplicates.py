@@ -1,5 +1,6 @@
 import os
 import gc
+import mmap
 import re
 import hashlib
 from pathlib import Path
@@ -109,8 +110,6 @@ def search(directory, extensions=None):
     for group in grouped:
         if len(group) == 1:
             continue
-        block_size = max(1024, group[0].size//100)
-        [handle.set_block_size(block_size) for handle in group]
         part = objects_dupli(group)
         total.extend(part)
 
@@ -125,7 +124,7 @@ class FileHash:
     __slots__ = ('block_size', 'filename', 'size', 'digest', 'hexdigest', 'end', 'last_position')
 
     def __init__(self, filename):
-        self.block_size = 1024  # 1kB
+        self.block_size = mmap.PAGESIZE  # usually 4kB
         self.filename = filename
         self.size = os.stat(filename).st_size
         self.digest = hashlib.sha256()

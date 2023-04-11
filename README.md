@@ -38,6 +38,10 @@ print(results)
 ![image](screenshots/duplicate01.png)
 
 ## changelog
+
+- v. 0.1.4
+    - default block size equals system page size (usually 4kB)
+
 - v. 0.1.3
     - reading chunks of data using "with" statement. Only one file handle at the time is opened
     - `keep searching...` while search lasts
@@ -55,6 +59,16 @@ print(results)
 - v. 0.1.0
     - gui
     - matching hashes of full file content
+
+## develop & debug
+
+```bash
+python -m venv venv
+venv/Scripts/Activate.ps1
+python -m duplicate
+python -m duplicate . ".py"
+python -m duplicate --help
+```
 
 ## ideas
 
