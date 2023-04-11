@@ -30,9 +30,25 @@ def generate_data():
     return data
 
 
+def create_big_files():
+    """create two big files
+
+    ignore those files in .gitignore
+    """
+    first_data = b'A'*4*1024*1024*10 + b'XY'
+    second_data = b'A'*4*1024*1024*10 + b'YZ'
+    first_file = 'XY.bin'
+    second_file = 'YZ.bin'
+    write_bin(first_file, first_data)
+    write_bin(second_file, second_data)
+
+
 if __name__ == "__main__":
     script_path()
-    for x in range(20):
-        name = "".join(random.choices(ascii_uppercase, k=10)) + ".bin"
-        data = generate_data()
-        write_bin(name, data)
+    # for x in range(20):
+    #     name = "".join(random.choices(ascii_uppercase, k=10)) + ".bin"
+    #     data = generate_data()
+    #     write_bin(name, data)
+
+    # create files for maximum recursion depth tests
+    create_big_files()

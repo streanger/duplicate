@@ -63,11 +63,16 @@ print(results)
 ## develop & debug
 
 ```bash
+# general setup & tests
 python -m venv venv
 venv/Scripts/Activate.ps1
 python -m duplicate
 python -m duplicate . ".py"
 python -m duplicate --help
+
+# max recursion depth half-auto tests
+python .\scripts\create_files.py
+python -m duplicate scripts
 ```
 
 ## ideas
@@ -103,3 +108,5 @@ python -m duplicate --help
 - pylint & black todo
 
 - screenshot(s) to upload (+)
+
+- tests for maximum recursion depth

@@ -110,6 +110,8 @@ def search(directory, extensions=None):
     for group in grouped:
         if len(group) == 1:
             continue
+        block_size = max(mmap.PAGESIZE, group[0].size//100)
+        [handle.set_block_size(block_size) for handle in group]
         part = objects_dupli(group)
         total.extend(part)
 

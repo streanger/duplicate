@@ -9,3 +9,7 @@ __pycache__/
 env/
 venv/
 ENV/
+
+# big test files
+scripts/XY.bin
+scripts/YZ.bin
