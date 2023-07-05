@@ -28,7 +28,7 @@ duplicate.gui()
 # console search
 from rich import print
 from duplicate import search
-directory = 'path/to/directory/with/duplicates
+directory = 'path/to/directory/with/duplicates'
 results = search(directory)
 print(results)
 ```
