@@ -1,10 +1,10 @@
-import os
 import gc
-import mmap
-import re
 import hashlib
+import mmap
+import os
+import re
+from itertools import filterfalse, groupby
 from pathlib import Path
-from itertools import groupby, filterfalse
 
 
 def list_directory_files(directory):

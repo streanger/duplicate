@@ -39,42 +39,24 @@ structure tree:
 """
 
 import argparse
-import sys
-import os
 import logging
-import threading
+import os
 import subprocess
+import sys
+import threading
 from pathlib import Path
-from tkinter import (
-    Tk,
-    Menu,
-    Entry,
-    Frame,
-    Label,
-    IntVar,
-    LabelFrame,
-    Checkbutton,
-    filedialog,
-    Button,
-    font,
-    YES,
-    NO,
-    TOP,
-    END,
-    BOTTOM,
-    LEFT,
-    BOTH,
-    W,
-)
+from tkinter import (BOTH, BOTTOM, END, LEFT, NO, TOP, YES, Button,
+                     Checkbutton, Entry, Frame, IntVar, Label, LabelFrame,
+                     Menu, Tk, W, filedialog, font)
 
-from send2trash import send2trash
-from rich.logging import RichHandler
 from rich import print
+from rich.logging import RichHandler
+from send2trash import send2trash
 
 # my modules
-from duplicate.search_duplicates import search, split_extensions
-from duplicate.scrolled_frame import VerticalScrolledFrame
 from duplicate.__version__ import __version__
+from duplicate.scrolled_frame import VerticalScrolledFrame
+from duplicate.search_duplicates import search, split_extensions
 
 
 class DuplicatesGUI(Frame):
@@ -211,6 +193,7 @@ class DuplicatesGUI(Frame):
         https://stackoverflow.com/questions/15995783/how-to-delete-all-children-elements
         """
         # search for duplicates
+        self.extensions_entry_callback(None)  # reload extensions
         self.info_label.config(text="keep searching...")
         duplicates = search(self.directory, self.extensions)
         logging.info(duplicates)
@@ -242,7 +225,7 @@ class DuplicatesGUI(Frame):
                 )
                 remove_box.bind(
                     "<Button-3>",
-                    lambda event, path=Path(filepath).parent: self.popup(event, path),
+                    lambda event, path=filepath: self.popup(event, path),
                 )
                 remove_box.pack(expand=YES, fill=BOTH, side=TOP)
                 self.check_buttons[filepath] = remove_box
@@ -391,7 +374,7 @@ class DuplicatesGUI(Frame):
         """
         popup_menu = Menu(self, tearoff=0)
         popup_menu.add_command(
-            label="open directory", command=lambda: open_directory(path)
+            label="open directory", command=lambda: select_file(path)
         )
         try:
             popup_menu.tk_popup(event.x_root, event.y_root, 0)
@@ -405,22 +388,21 @@ class DuplicatesGUI(Frame):
         self.master.quit()
 
 
-def open_directory(directory):
+def select_file(path):
     """open directory(file) - cross platform
     https://stackoverflow.com/questions/3022013/windows-cant-find-the-file-on-subprocess-call
     https://python-forum.io/thread-10689.html
     """
-    logging.info("{}".format(directory))
+    logging.info("{}".format(path))
     if sys.platform == "darwin":
         opener = "open"
     elif sys.platform == "win32":
-        opener = "start"
-        os.startfile(directory, "open")  # Windows only
+        subprocess.Popen(f'explorer /select,"{path}"')
         return True
     else:
         opener = "xdg-open"
-    logging.info("{} -> {}".format(opener, directory))
-    subprocess.call([opener, directory], shell=True)
+    logging.info("{} -> {}".format(opener, path))
+    subprocess.call([opener, path], shell=True)
     return None
 
 
@@ -476,6 +458,4 @@ if __name__ == "__main__":
     FORMAT = "%(message)s"
     LEVEL = logging.INFO
     logging.basicConfig(format=FORMAT, level=LEVEL, handlers=[RichHandler()])
-
-    # entrypoint
-    duplicate_entrypoint()
+    duplicate_entrypoint()  # entrypoint

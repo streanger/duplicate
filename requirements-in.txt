@@ -1,0 +1,2 @@
+rich
+Send2Trash

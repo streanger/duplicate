@@ -6,7 +6,6 @@ version_info = {}
 exec(version_path.read_text(), version_info)
 long_description = Path("README.md").read_text()
 requirements = Path('requirements.txt').read_text().splitlines()
-# pip install rich Send2Trash
 
 setuptools.setup(
     name='duplicate',

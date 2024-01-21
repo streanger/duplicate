@@ -39,6 +39,10 @@ print(results)
 
 ## changelog
 
+- v. 0.1.5
+    - select file instead of opening directory
+    - reload extensions before search
+
 - v. 0.1.4
     - default block size equals system page size (usually 4kB)
 
@@ -73,6 +77,9 @@ python -m duplicate --help
 # max recursion depth half-auto tests
 python .\scripts\create_files.py
 python -m duplicate scripts
+
+# duplicate.main
+python -m duplicate.main
 ```
 
 ## ideas
